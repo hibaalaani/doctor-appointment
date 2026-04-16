@@ -1,14 +1,36 @@
 import os
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from database import engine, Base
+from database import engine, Base, SessionLocal
 from routers import auth, doctors, appointments, npi
+import models
 
-# Create all tables on startup (use Alembic for production migrations)
-Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="AppointmentPro API", version="2.0.0")
+def _auto_seed():
+    """Seed sample doctors if the table is empty."""
+    from seed import SAMPLE_DOCTORS
+    db = SessionLocal()
+    try:
+        if db.query(models.Doctor).count() == 0:
+            for data in SAMPLE_DOCTORS:
+                db.add(models.Doctor(**data))
+            db.commit()
+            print(f"Auto-seeded {len(SAMPLE_DOCTORS)} doctors.")
+    finally:
+        db.close()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Create tables then seed on every cold start
+    Base.metadata.create_all(bind=engine)
+    _auto_seed()
+    yield
+
+
+app = FastAPI(title="AppointmentPro API", version="2.0.0", lifespan=lifespan)
 
 # Allow localhost in dev + any Render frontend URL set via env var
 _extra = os.getenv("ALLOWED_ORIGIN", "")
