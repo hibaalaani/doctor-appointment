@@ -1,0 +1,41 @@
+services:
+  # ── FastAPI Backend ─────────────────────────────────────────────────────────
+  - type: web
+    name: appointmentpro-api
+    runtime: python
+    rootDir: api
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: appointmentpro-db
+          property: connectionString
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "1440"
+      - key: ALLOWED_ORIGIN
+        sync: false   # you'll fill this in after the frontend is deployed
+
+  # ── React Frontend ──────────────────────────────────────────────────────────
+  - type: web
+    name: appointmentpro-client
+    runtime: node
+    rootDir: client
+    buildCommand: npm install && npm run build
+    startCommand: npx serve -s build -l $PORT
+    envVars:
+      - key: REACT_APP_API_URL
+        fromService:
+          name: appointmentpro-api
+          type: web
+          property: host
+          envVarKey: REACT_APP_API_URL
+
+databases:
+  - name: appointmentpro-db
+    databaseName: appointmentpro
+    user: appointmentpro
