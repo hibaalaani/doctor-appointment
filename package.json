@@ -1,0 +1,12 @@
+{
+  "name": "appointmentpro",
+  "version": "2.0.0",
+  "description": " doctor appointment booking app",
+  "scripts": {
+    "client": "npm start --prefix client",
+    "api": "cd api && uvicorn main:app --reload --port 8000",
+    "seed": "cd api && python seed.py"
+  },
+  "author": "hiba",
+  "license": "ISC"
+}
