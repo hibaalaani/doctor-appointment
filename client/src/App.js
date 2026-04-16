@@ -1,5 +1,11 @@
 import "./App.css";
+import { useEffect } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import axios from "axios";
+
+const BASE_URL =
+  process.env.REACT_APP_API_URL ||
+  "https://doctor-appointment-k9kz.onrender.com";
 
 import NavbarNav     from "./pages/Navbar";
 import Home          from "./components/Home";
@@ -10,6 +16,11 @@ import SignUp        from "./pages/SignUp";
 import MyBookings    from "./pages/MyBookings";
 
 function App() {
+  // Ping the backend on load so it wakes up from Render free-tier sleep
+  useEffect(() => {
+    axios.get(`${BASE_URL}/health`).catch(() => {});
+  }, []);
+
   return (
     <Router>
       <div className="App">

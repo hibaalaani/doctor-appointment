@@ -19,7 +19,11 @@ function SignUp() {
       localStorage.setItem("userToken", data.access_token);
       history.push("/doctors");
     } catch (err) {
-      setError(err.response?.data?.detail || "Registration failed");
+      if (!err.response) {
+        setError("Cannot reach the server. It may be waking up — please wait 30 seconds and try again.");
+      } else {
+        setError(err.response.data?.detail || "Registration failed");
+      }
     } finally {
       setLoading(false);
     }
