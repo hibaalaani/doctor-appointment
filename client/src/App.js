@@ -2,11 +2,6 @@ import "./App.css";
 import { useEffect } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import axios from "axios";
-
-const BASE_URL =
-  process.env.REACT_APP_API_URL ||
-  "https://doctor-appointment-k9kz.onrender.com";
-
 import NavbarNav     from "./pages/Navbar";
 import Home          from "./components/Home";
 import DoctorSearch  from "./components/AllClinics";
@@ -14,6 +9,10 @@ import DoctorProfile from "./pages/DoctorProfile";
 import Login         from "./pages/Login";
 import SignUp        from "./pages/SignUp";
 import MyBookings    from "./pages/MyBookings";
+
+const BASE_URL =
+  process.env.REACT_APP_API_URL ||
+  "https://doctor-appointment-k9kz.onrender.com";
 
 function App() {
   // Ping the backend on load so it wakes up from Render free-tier sleep
