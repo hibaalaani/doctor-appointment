@@ -9,6 +9,10 @@ load_dotenv()
 # For production I have to set DATABASE_URL=postgresql://user:pass@host/dbname in .env
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./appointmentpro.db")
 
+# Render (and Heroku) provide postgres:// but SQLAlchemy 2.x requires postgresql://
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
 # SQLite needs check_same_thread=False; PostgreSQL ignores this arg
 connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
 
