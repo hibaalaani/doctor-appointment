@@ -32,14 +32,10 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="AppointmentPro API", version="2.0.0", lifespan=lifespan)
 
-# Allow localhost in dev + any Render frontend URL set via env var
-_extra = os.getenv("ALLOWED_ORIGIN", "")
-allowed_origins = ["http://localhost:3000"] + ([_extra] if _extra else [])
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )

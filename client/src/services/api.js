@@ -1,8 +1,12 @@
 import axios from "axios";
 
-const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || "/",
-});
+// REACT_APP_API_URL is baked in at build time.
+// If missing, fall back to the known Render backend URL.
+const BASE_URL =
+  process.env.REACT_APP_API_URL ||
+  "https://doctor-appointment-k9kz.onrender.com";
+
+const api = axios.create({ baseURL: BASE_URL });
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("userToken");
