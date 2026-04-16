@@ -1,3 +1,4 @@
+import traceback
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 
@@ -10,20 +11,26 @@ router = APIRouter()
 
 @router.post("/register", response_model=schemas.TokenResponse, status_code=201)
 def register(body: schemas.UserCreate, db: Session = Depends(get_db)):
-    if db.query(models.User).filter(models.User.email == body.email).first():
-        raise HTTPException(status_code=400, detail="Email already registered")
+    try:
+        if db.query(models.User).filter(models.User.email == body.email).first():
+            raise HTTPException(status_code=400, detail="Email already registered")
 
-    user = models.User(
-        name=body.name,
-        email=body.email,
-        hashed_password=hash_password(body.password),
-    )
-    db.add(user)
-    db.commit()
-    db.refresh(user)
+        user = models.User(
+            name=body.name,
+            email=body.email,
+            hashed_password=hash_password(body.password),
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
 
-    token = create_access_token({"sub": str(user.id)})
-    return {"access_token": token, "user": user}
+        token = create_access_token({"sub": str(user.id)})
+        return {"access_token": token, "user": user}
+    except HTTPException:
+        raise
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/login", response_model=schemas.TokenResponse)
